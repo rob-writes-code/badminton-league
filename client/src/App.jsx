@@ -1,9 +1,12 @@
 import React from 'react';
-import './App.module.scss';
+import styles from './App.module.scss';
+import ScoreCard from './components/ScoreCard/ScoreCard';
 
 const App = () => {
   return (
-    <h1>WORKING!</h1>
+    <>
+    <ScoreCard />
+    </>
   );
 };
 
