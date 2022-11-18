@@ -1,23 +1,29 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const connectDB = require('./config/db');
+const colors = require('colors');
 
-require("dotenv").config({ path: "./config.env" });
-const port = process.env.PORT || 5000;
+const dotenv = require('dotenv').config();
+
+const port = process.env.PORT || 5100;
+
+// run function to connect to the database;
+connectDB();
 
 // express middleware
 app.use(cors());
 app.use(express.json());
-app.use(require("./routes/record"));
+// may need urlencoded too
 
-// get driver connection
-const dbo = require("./db/conn");
- 
-app.listen(port, () => {
-  // perform a database connection when server starts
-  dbo.connectToServer(function (err) {
-    if (err) console.error(err);
- 
-  });
-  console.log(`Server is running on port: ${port}`);
-});
+// Routes
+app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/teams', require('./routes/teamRoutes'));
+
+app.get('/', (req, res) => {
+  res.send('HI BABY!!! Looking GOOD...')
+})
+
+app.listen(port,
+  console.log(`Running in ${process.env.NODE_ENV} mode on port ${port}`)
+);
