@@ -1,17 +1,19 @@
 const express = require('express');
 const router = express.Router();
+const { getUsers, setUser, updateUser, deleteUser } = require('../controllers/userController');
+
+// authentication dependencies
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 
 const User = require('../models/User');
 
-router.get('/', (req, res) => {
-    res.status(200).json({ msg: "Get user page!" });
-})
+// CRUD routes
+router.get('/', getUsers);
+router.post('/', setUser);
+router.put('/:id', updateUser);
+router.delete('/:id', deleteUser);
 
-router.post('/', (req, res) => {
-    res.status(200).json({ msg: "Posting to userrrr!" }) // instead of .send as deprecated
-})
 
 module.exports = router;
