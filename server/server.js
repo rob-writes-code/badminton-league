@@ -16,7 +16,8 @@ app.use(cors());
 app.use(express.json());
 // may need urlencoded too
 
-// Routes
+// Setting up routes
+// Moves HTTP requests from server.js file to improve file structure
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/teams', require('./routes/teamRoutes'));
 
