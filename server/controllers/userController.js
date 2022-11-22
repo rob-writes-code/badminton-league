@@ -2,23 +2,30 @@
 // and passing them to your express error handlers.
 const asyncHandler = require('express-async-handler');
 
+const User = require('../models/User');
+
 // @desc    Get users
 // @route   GET /api/users
 // @access  Private
 const getUsers = asyncHandler(async (req, res) => {
-    res.status(200).json({ msg: "GET all users" })
+    const users = await User.find();
+    res.status(200).json(users)
 });
 
 // @desc    Set user
 // @route   POST /api/users
 // @access  Private
 const setUser = asyncHandler(async (req, res) => {
-    if(!req.body.username) {
+    if (!req.body.username) {
         res.status(400)
         throw new Error('Please enter a username') // uses Express built-in error handler
     };
 
-    res.status(200).json({ msg: "POST user" })
+    const user = await User.create({
+        username: req.body.username
+    })
+
+    res.status(200).json(user)
 });
 
 // @desc    Update user
@@ -26,7 +33,16 @@ const setUser = asyncHandler(async (req, res) => {
 // @access  Private
 const updateUser = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    res.status(200).json({ msg: `Update user ${id}` })
+    const user = await User.findById(id);
+
+    if (!user) {
+        res.status(400)
+        throw new Error('User not found')
+    };
+
+    const updatedUser = await User.findByIdAndUpdate(id, req.body, { new: true })
+
+    res.status(200).json(updatedUser)
 });
 
 // @desc    Delete user
@@ -34,7 +50,16 @@ const updateUser = asyncHandler(async (req, res) => {
 // @access  Private
 const deleteUser = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    res.status(200).json({ msg: `DELETE user ${id}` })
+    const user = await User.findById(id);
+
+    if (!user) {
+        res.status(400)
+        throw new Error('User not found')
+    };
+
+   await User.findByIdAndDelete(id)
+
+    res.status(200).json({ id: id })
 });
 
 
