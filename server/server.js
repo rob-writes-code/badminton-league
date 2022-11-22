@@ -5,6 +5,7 @@ const connectDB = require('./config/db');
 const colors = require('colors');
 
 const dotenv = require('dotenv').config();
+const { errorHandler } = require('./middleware/errorMiddleware');
 
 const port = process.env.PORT || 5100;
 
@@ -14,12 +15,15 @@ connectDB();
 // express middleware
 app.use(cors());
 app.use(express.json());
-// may need urlencoded too
+app.use(express.urlencoded({ extended: false }));
+
 
 // Setting up routes
 // Moves HTTP requests from server.js file to improve file structure
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/teams', require('./routes/teamRoutes'));
+
+app.use(errorHandler);
 
 app.get('/', (req, res) => {
   res.send('HI BABY!!! Looking GOOD...')
