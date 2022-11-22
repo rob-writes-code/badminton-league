@@ -23,6 +23,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/teams', require('./routes/teamRoutes'));
 
+// tells app to use middleware errorHandler instead of default
 app.use(errorHandler);
 
 app.get('/', (req, res) => {
