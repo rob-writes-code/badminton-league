@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+
+// HTTP methods organised into a controller file
 const { 
     getUsers,
     setUser,

@@ -1,11 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const asyncHandler = require('express-async-handler');
 
-const Team = require('../models/Team');
+// HTTP methods organised into a controller file
+const { 
+    getTeams,
+    setTeam,
+    updateTeam,
+    deleteTeam 
+} = require('../controllers/teamController');
 
-router.post('/', (req, res) => {
-    res.status(200).json({msg: "Posting to teams!"}) // instead of .send as deprecated
-})
+// CRUD routes
+router.route('/').get(getTeams).post(setTeam);
+router.route('/:id').put(updateTeam).delete(deleteTeam);
 
 module.exports = router;

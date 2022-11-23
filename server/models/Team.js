@@ -8,11 +8,9 @@ const TeamSchema = mongoose.Schema({
     },
     division: {
         type: String,
-        required: true
     },
     league: {
         type: String,
-        required: true
     },
     rubbers: Number,
     matchesPlayed: Number,
