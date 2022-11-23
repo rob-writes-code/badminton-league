@@ -3,26 +3,28 @@
 const asyncHandler = require('express-async-handler');
 
 const Team = require('../models/Team');
+const User = require('../models/User');
 
 // @desc    Get teams
 // @route   GET /api/teams
 // @access  Private
 const getTeams = asyncHandler(async (req, res) => {
-    const teams = await Team.find();
+    const teams = await Team.find({ user: req.user.id });
     res.status(200).json(teams)
 });
 
-// @desc    Set team
+// @desc    Create team
 // @route   POST /api/teams
 // @access  Private
-const setTeam = asyncHandler(async (req, res) => {
+const createTeam = asyncHandler(async (req, res) => {
     if (!req.body.teamName) {
         res.status(400)
         throw new Error('Please enter a team name') // uses Express built-in error handler
     };
 
     const user = await Team.create({
-        teamName: req.body.teamName
+        teamName: req.body.teamName,
+        user: req.user.id
     })
 
     res.status(200).json(user)
@@ -39,6 +41,20 @@ const updateTeam = asyncHandler(async (req, res) => {
         res.status(400)
         throw new Error('Team not found')
     };
+
+    const user = await User.findById(req.user.id)
+
+    // Check for user
+    if (!user) {
+        res.status(401)
+        throw new Error('User not found')
+    }
+
+    // Make sure the logged in user matches the team user
+    if (team.user.toString() !== user.id) {
+        res.status(401)
+        throw new Error('User not authorized')
+    } 
 
     const updatedTeam = await Team.findByIdAndUpdate(id, req.body, { new: true })
 
@@ -57,7 +73,21 @@ const deleteTeam = asyncHandler(async (req, res) => {
         throw new Error('Team not found')
     };
 
-   await Team.findByIdAndDelete(id)
+    const user = await User.findById(req.user.id)
+
+    // Check for user
+    if (!user) {
+        res.status(401)
+        throw new Error('User not found')
+    }
+
+    // Make sure the logged in user matches the team user
+    if (team.user.toString() !== user.id) {
+        res.status(401)
+        throw new Error('User not authorized')
+    } 
+
+    await Team.findByIdAndDelete(id)
 
     res.status(200).json({ id: id })
 });
@@ -65,7 +95,7 @@ const deleteTeam = asyncHandler(async (req, res) => {
 
 module.exports = {
     getTeams,
-    setTeam,
+    createTeam,
     updateTeam,
     deleteTeam
 }
