@@ -2,70 +2,85 @@
 // and passing them to your express error handlers.
 const asyncHandler = require('express-async-handler');
 
+// authentication dependencies
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+// model schema
 const User = require('../models/User');
 
-// @desc    Get users
-// @route   GET /api/users
-// @access  Private
-const getUsers = asyncHandler(async (req, res) => {
-    const users = await User.find();
-    res.status(200).json(users)
+// @desc    Authenticate a user
+// @route   POST /api/users/login
+// @access  Public
+const loginUser = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
+
+    // Check for user email
+    const user = await User.findOne({ email })
+
+    if (user && (await bcrypt.compare(password, user.password))) {
+        res.json({
+            _id: user.id,
+            username: user.username,
+            email: user.email
+        })
+    } else {
+        res.status(400)
+        throw new Error('Invalid user credentials')
+    }
 });
 
-// @desc    Set user
+// @desc    Register a new user
 // @route   POST /api/users
-// @access  Private
-const setUser = asyncHandler(async (req, res) => {
-    if (!req.body.username) {
+// @access  Public
+const registerUser = asyncHandler(async (req, res) => {
+    const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
         res.status(400)
-        throw new Error('Please enter a username') // uses Express built-in error handler
+        throw new Error('Please add all fields')
     };
 
+    // Check if user exists
+    const userExists = await User.findOne({ email })
+
+    if (userExists) {
+        res.status(400)
+        throw new Error('User already exists')
+    }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10)
+    const hashedPassword = await bcrypt.hash(password, salt)
+
+    // Create user
     const user = await User.create({
-        username: req.body.username
+        username,
+        email,
+        password: hashedPassword
     })
 
-    res.status(200).json(user)
-});
-
-// @desc    Update user
-// @route   PUT /api/users/:id
-// @access  Private
-const updateUser = asyncHandler(async (req, res) => {
-    const { id } = req.params;
-    const user = await User.findById(id);
-
-    if (!user) {
+    if (user) {
+        res.status(201).json({
+            _id: user.id,
+            username: user.username,
+            email: user.email
+        })
+    } else {
         res.status(400)
-        throw new Error('User not found')
-    };
-
-    const updatedUser = await User.findByIdAndUpdate(id, req.body, { new: true })
-
-    res.status(200).json(updatedUser)
+        throw new Error('Invalid user data')
+    }
 });
 
-// @desc    Delete user
-// @route   DELETE /api/users/:id
-// @access  Private
-const deleteUser = asyncHandler(async (req, res) => {
-    const { id } = req.params;
-    const user = await User.findById(id);
-
-    if (!user) {
-        res.status(400)
-        throw new Error('User not found')
-    };
-
-   await User.findByIdAndDelete(id)
-
-    res.status(200).json({ id: id })
+// @desc    Get user data
+// @route   GET /api/users/me
+// @access  Public
+const getMe = asyncHandler(async (req, res) => {
+    res.json({ message: 'User data disaply' })
 });
-
 
 module.exports = {
-    getUsers,
-    setUser,
-    updateUser,
-    deleteUser
+    loginUser,
+    registerUser,
+    getMe
 }

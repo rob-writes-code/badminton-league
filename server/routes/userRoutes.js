@@ -3,22 +3,16 @@ const router = express.Router();
 
 // HTTP methods organised into a controller file
 const { 
-    getUsers,
-    setUser,
-    updateUser,
-    deleteUser 
+    loginUser,
+    registerUser,
+    getMe 
 } = require('../controllers/userController');
 
-// authentication dependencies
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const asyncHandler = require('express-async-handler');
-
-const User = require('../models/User');
-const { set } = require('mongoose');
+const { set } = require('mongoose'); // ???
 
 // CRUD routes
-router.route('/').get(getUsers).post(setUser);
-router.route('/:id').put(updateUser).delete(deleteUser);
+router.post('/login', loginUser)
+router.post('/', registerUser)
+router.get('/me', getMe)
 
 module.exports = router;
