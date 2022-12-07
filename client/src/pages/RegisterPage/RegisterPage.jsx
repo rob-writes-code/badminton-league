@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react"
 import axios from 'axios'
+import styles from './RegisterPage.module.scss'
+import { Link } from "react-router-dom";
 
 const RegisterPage = () => {
     const [username, setUsername] = useState('')
@@ -28,7 +30,7 @@ const RegisterPage = () => {
         console.log('username', username)
         console.log('password', password)
         console.log('email', email)
-        
+
         createUser()
     }
 
@@ -44,15 +46,16 @@ const RegisterPage = () => {
 
     return (
         <div>
-            <form onSubmit={onSubmit}>
+            <form className={styles.form} onSubmit={onSubmit}>
                 <label htmlFor="username">Username:</label>
-                <input onChange={onChangeUsername} value={username} id='username' name="username" type="text" placeholder='username' />
+                <input className={styles.form__input} onChange={onChangeUsername} value={username} id='username' name="username" type="text" placeholder='username' />
                 <label htmlFor="email">Email:</label>
-                <input onChange={onChangeEmail} value={email} id='email' name="email" type="email" placeholder='email' />
+                <input className={styles.form__input} onChange={onChangeEmail} value={email} id='email' name="email" type="email" placeholder='email' />
                 <label htmlFor="password">Password:</label>
-                <input onChange={onChangePassword} value={password} id='password' name='password' type="password" placeholder='password' />
-                <button>Submit</button>
+                <input className={styles.form__input} onChange={onChangePassword} value={password} id='password' name='password' type="password" placeholder='password' />
+                <button className={styles.form__input}>Submit</button>
             </form>
+            <Link to={'/'}>Back to Homepage</Link>
         </div>
     )
 }
