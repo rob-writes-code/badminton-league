@@ -1,21 +1,19 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import axios from 'axios'
-import styles from './RegisterPage.module.scss'
 import { Link } from "react-router-dom";
+import styles from '../RegisterPage/RegisterPage.module.scss' // from RegisterPage
+import UserContext from "../../UserContext";
 
-const RegisterPage = () => {
-    const [username, setUsername] = useState('')
+const LoginPage = () => {
+
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
+    const { user, setUser } = useContext(UserContext)
+
     // useEffect(() => {
-    //     console.log(username)
-    // }, [username])
-
-
-    const onChangeUsername = (e) => {
-        setUsername(e.target.value)
-    }
+    //     console.log(email, password)
+    // }, [email, password])
 
     const onChangeEmail = (e) => {
         setEmail(e.target.value)
@@ -27,23 +25,27 @@ const RegisterPage = () => {
 
     const onSubmit = (e) => {
         e.preventDefault()
-        console.log('username', username)
         console.log('password', password)
         console.log('email', email)
 
-        createUser()
+        loginUser()
     }
 
-    const createUser = async () => {
+    const loginUser = async () => {
         const user = {
-            username,
             email,
             password
         }
         try {
-            const response = await axios.post("http://localhost:5100/api/users", user)
-            console.log(response)
-            
+            const response = await axios.post("http://localhost:5100/api/users/login", user)
+            // setUser(response.data)
+            setUser(response.data)
+            console.log(response.data)
+
+            if (response.data.token) {
+                localStorage.setItem('user', JSON.stringify(response.data))
+            }
+
         } catch (error) {
             console.log(error)
         }
@@ -52,8 +54,6 @@ const RegisterPage = () => {
     return (
         <div>
             <form className={styles.form} onSubmit={onSubmit}>
-                <label htmlFor="username">Username:</label>
-                <input className={styles.form__input} onChange={onChangeUsername} value={username} id='username' name="username" type="text" placeholder='username' />
                 <label htmlFor="email">Email:</label>
                 <input className={styles.form__input} onChange={onChangeEmail} value={email} id='email' name="email" type="email" placeholder='email' />
                 <label htmlFor="password">Password:</label>
@@ -64,5 +64,4 @@ const RegisterPage = () => {
         </div>
     )
 }
-
-export default RegisterPage
+export default LoginPage
